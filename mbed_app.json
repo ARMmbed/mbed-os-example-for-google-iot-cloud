@@ -1,0 +1,30 @@
+{
+    "config": {
+
+    },
+    "target_overrides": {
+        "*": {
+            "mbed-trace.enable": true,
+            "mbed-trace.max-level": "TRACE_LEVEL_INFO",
+	    "google-client.iotc-debug-printf": "gcp_iot_puts",
+            "rtos.main-thread-stack-size": 8192,
+            "rtos.thread-stack-size": 2048,
+            "platform.error-filename-capture-enabled": true,
+            "platform.stdio-convert-newlines": true,
+            "platform.stdio-baud-rate": 115200					
+        },
+        "DISCO_L475VG_IOT01A": {
+            "target.network-default-interface-type": "WIFI",
+            "nsapi.default-wifi-security": "WPA_WPA2",
+            "nsapi.default-wifi-ssid": "\"\"",
+            "nsapi.default-wifi-password": "\"\""
+        }
+    },
+    "macros": [        
+        "IOTC_FS_MEMORY=1",
+	"IOTC_TLS_LIB_MBEDTLS=1"
+    ]
+}
+
+    
+
