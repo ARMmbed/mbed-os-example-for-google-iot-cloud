@@ -1,28 +1,48 @@
 {
     "config": {
+        "google-cloud-project-id": {
+            "help": "Google cloud project id",
+            "value": "\"project-plane-...\""
+        },
+        "google-cloud-region": {
+            "help": "Google cloud region",
+            "value": "\"..REGION..\""
+        },
+        "google-cloud-registry": {
+            "help": "Google cloud registry",
+            "value": "\"..registry..\""
+        },
+        "google-cloud-device-id": {
+            "help": "Google cloud device id",
+            "value": "\"..device..\""
+        },
+        "google-cloud-mqtt-topic": {
+            "help": "Topic to subscribe & publish to",
+            "value": "\"mbed-os\""
+        }
 
     },
     "target_overrides": {
         "*": {
-            "mbed-trace.enable": true,
-            "mbed-trace.max-level": "TRACE_LEVEL_INFO",
-	    "google-client.iotc-debug-printf": "gcp_iot_puts",
-            "rtos.main-thread-stack-size": 8192,
-            "rtos.thread-stack-size": 2048,
-            "platform.error-filename-capture-enabled": true,
+	    "google-client.iotc-debug-printf": "printf",
             "platform.stdio-convert-newlines": true,
-            "platform.stdio-baud-rate": 115200					
+            "platform.stdio-baud-rate": 115200,
+            "target.components_remove": ["BlueNRG_MS"],
+            "target.features_remove": ["BLE"]
         },
         "DISCO_L475VG_IOT01A": {
+            "target.components_add": ["wifi_ism43362"],
             "target.network-default-interface-type": "WIFI",
             "nsapi.default-wifi-security": "WPA_WPA2",
-            "nsapi.default-wifi-ssid": "\"\"",
-            "nsapi.default-wifi-password": "\"\""
+            "nsapi.default-wifi-ssid": "\"SSIS\"",
+            "nsapi.default-wifi-password": "\"pwd\""
         }
     },
     "macros": [        
         "IOTC_FS_MEMORY=1",
-	"IOTC_TLS_LIB_MBEDTLS=1"
+	"IOTC_TLS_LIB_MBEDTLS=1",
+        "MBEDTLS_SHA1_C=1",
+        "MBEDTLS_SSL_MAX_CONTENT_LEN=4096"
     ]
 }
 
