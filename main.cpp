@@ -1,3 +1,8 @@
+/* Mbed OS Google Cloud example
+ * Copyright (c) 2018-2020, Google LLC.
+ * Copyright (c) 2019-2020, Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "mbed.h"
 #include "mbed_trace.h"
 #include "mbedtls/debug.h"
@@ -6,43 +11,22 @@
 #include "iotc.h"
 #include "NTPClient.h"
 #include "rtos/ThisThread.h"
-
-/*
-
- * PEM-encoded client private key.
- *
- * Must include the PEM header and footer,
- * and every line of the body needs to be quoted and end with \n:
- * "-----BEGIN EC PRIVATE KEY-----\n"
- * "...base64 data...\n"
- * "-----END EC PRIVATE KEY-----";
- */
-char clientKey[] = "-----BEGIN EC PRIVATE KEY-----\n"
-"...\n"
-"...\n"
-"...\n"
-"-----END EC PRIVATE KEY-----\n";
-
-
-#define IOTC_UNUSED(x) (void)(x)
+#include "google_cloud_credentials.h"
 
 #define MQTT_CONNECTION_TIMEOUT_SEC 10
 #define MQTT_KEEPALIVE_TIMEOUT_SEC 20
 #define JWT_EXPIRATION_PERIOD_SEC 3600
 
-#define STRING_CAT(x) x
-#define SUBSTR(x) STRING_CAT(x)
+#define MBED_APP_IOTC_DEVICE_PATH  "projects/" MBED_CONF_APP_GOOGLE_CLOUD_PROJECT_ID \
+                                           "/locations/" MBED_CONF_APP_GOOGLE_CLOUD_REGION "/registries/" \
+                                           MBED_CONF_APP_GOOGLE_CLOUD_REGISTRY  "/devices/" \
+                                           MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID
 
-#define MBED_CONF_APP_IOTC_DEVICE_PATH  "projects/" SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_PROJECT_ID) \
-                                           "/locations/" SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_REGION) "/registries/" \
-                                           SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_REGISTRY)  "/devices/" \
-                                           SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID)
-
-#define MBED_CONF_APP_MQTT_TOPIC  "/devices/" SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID) "/events/"\
-                                    SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_MQTT_TOPIC)
+#define MBED_APP_MQTT_TOPIC  "/devices/" MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID "/events/"\
+                                    MBED_CONF_APP_GOOGLE_CLOUD_MQTT_TOPIC
 
 
-#define MBED_CONF_APP_MQTT_SUB_TOPIC  "/devices/" SUBSTR(MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID) \
+#define MBED_APP_MQTT_SUB_TOPIC  "/devices/" MBED_CONF_APP_GOOGLE_CLOUD_DEVICE_ID \
                                     "/commands/#"
 
 
@@ -69,21 +53,26 @@ static void on_message_sent(iotc_context_handle_t in_context_handle,
 void publish_function(iotc_context_handle_t context_handle,
                       iotc_timed_task_handle_t timed_task, void *user_data)
 {
-    static int max_try_receive = 14;
+    static int max_try_receive = 10;
+    iotc_state_t state = IOTC_STATE_OK;
 
-    if (message_received) {        
+    if (message_received) {
         if (IOTC_INVALID_TIMED_TASK_HANDLE != timed_task) {
             iotc_cancel_timed_task(timed_task);
         }
         iotc_events_stop();
     } else if (max_try_receive > 0) {
-        char message[60] = {0};
+        char message[80] = {0};
         sprintf(message, "%d messages left to send, or until we receive a reply", max_try_receive);
         printf("publishing msg \"%s\"\n", message);
 
-        iotc_publish(context_handle, MBED_CONF_APP_MQTT_TOPIC, message,
-                     IOTC_MQTT_QOS_AT_MOST_ONCE,
-                     /*callback=*/&on_message_sent, /*user_data=*/NULL);
+        state = iotc_publish(context_handle, MBED_APP_MQTT_TOPIC, message,
+                             IOTC_MQTT_QOS_AT_MOST_ONCE,
+                             /*callback=*/&on_message_sent, /*user_data=*/NULL);
+        if (IOTC_STATE_OK != state) {
+            printf("iotc_publish returned with error: %ul : %s\n", state,
+                   iotc_get_state_string(state));
+        }
         max_try_receive--;
     }
 }
@@ -93,9 +82,7 @@ void on_message_received(iotc_context_handle_t context_handle,
                          const iotc_sub_call_params_t *const params,
                          iotc_state_t in_out_state, void *user_data)
 {
-    if (call_type == IOTC_SUB_CALL_SUBACK) {
-        return;
-    } else if (call_type == IOTC_SUB_CALL_MESSAGE) {
+    if (call_type == IOTC_SUB_CALL_MESSAGE) {
         printf("Message body: %s\n", params->message.temporary_payload_data);
         message_received = true;
     }
@@ -112,7 +99,7 @@ void on_connection_state_changed(iotc_context_handle_t in_context_handle,
         case IOTC_CONNECTION_STATE_OPENED:
             printf("connected to %s:%d\n", conn_data->host, conn_data->port);
             iotc_subscribe(in_context_handle,
-                           MBED_CONF_APP_MQTT_SUB_TOPIC,
+                           MBED_APP_MQTT_SUB_TOPIC,
                            IOTC_MQTT_QOS_AT_LEAST_ONCE,
                            &on_message_received, NULL);
 
@@ -196,24 +183,13 @@ void on_connection_state_changed(iotc_context_handle_t in_context_handle,
     }
 }
 
-int ntp_client()
+int ntp_client(NetworkInterface *net)
 {
-    auto net = NetworkInterface::get_default_instance();
-    if (!net) {
-        printf("Error! No network inteface found.\n");
-        return -1;
-    }
-    int ret = net->connect();
-    if (ret != 0) {
-        printf("Connection error: %d", ret);
-        return -1;
-    }
-
     NTPClient ntp(net);
     ntp.set_server("time.google.com", 123);
     time_t timestamp = ntp.get_timestamp();
     if (timestamp < 0) {
-        printf("Failed to get the current time, error: %ld\n", timestamp);
+        printf("Failed to get the current time, error: %ld\n", (long int)timestamp);
         return -1;
     }
     printf("Time: %s", ctime(&timestamp));
@@ -225,7 +201,17 @@ int main(int argc, char *argv[])
 {
     iotc_state_t state = IOTC_STATE_OK;
 
-    if (ntp_client() < 0) {
+    auto net = NetworkInterface::get_default_instance();
+    if (!net) {
+        printf("Error! No network inteface found.\n");
+        return -1;
+    }
+    int ret = net->connect();
+    if (ret != 0) {
+        printf("Connection error: %d", ret);
+        return -1;
+    }
+    if (ntp_client(net) < 0) {
         return -1;
     }
 
@@ -236,14 +222,14 @@ int main(int argc, char *argv[])
         IOTC_CRYPTO_KEY_SIGNATURE_ALGORITHM_ES256;
     iotc_connect_private_key_data.crypto_key_union_type =
         IOTC_CRYPTO_KEY_UNION_TYPE_PEM;
-    iotc_connect_private_key_data.crypto_key_union.key_pem.key = clientKey;
+    iotc_connect_private_key_data.crypto_key_union.key_pem.key = google_cloud::credentials::clientKey;
 
     /* Initialize iotc library and create a context to use to connect to the
      * GCP IoT Core Service. */
-    const iotc_state_t error_init = iotc_initialize();
+    state = iotc_initialize();
 
-    if (IOTC_STATE_OK != error_init) {
-        printf(" iotc failed to initialize, error: %d\n", error_init);
+    if (IOTC_STATE_OK != state) {
+        printf(" iotc failed to initialize, error: %d\n", state);
         return -1;
     }
 
@@ -252,7 +238,7 @@ int main(int argc, char *argv[])
         to numerous topics. */
     iotc_context = iotc_create_context();
     if (IOTC_INVALID_CONTEXT_HANDLE >= iotc_context) {
-        printf(" iotc failed to create context, error: %d\n", -iotc_context);
+        printf(" iotc failed to create context, error: %d\n", (int)-iotc_context);
         return -1;
     }
 
@@ -277,7 +263,7 @@ int main(int argc, char *argv[])
     implementation should handle both successful connections and
     unsuccessful connections as well as disconnections. */
     state = iotc_connect(iotc_context, /*username=*/NULL, /*password=*/jwt,
-                         /*client_id=*/MBED_CONF_APP_IOTC_DEVICE_PATH, MQTT_CONNECTION_TIMEOUT_SEC,
+                         /*client_id=*/MBED_APP_IOTC_DEVICE_PATH, MQTT_CONNECTION_TIMEOUT_SEC,
                          MQTT_KEEPALIVE_TIMEOUT_SEC, &on_connection_state_changed);
 
     if (IOTC_STATE_OK != state) {
@@ -300,7 +286,7 @@ int main(int argc, char *argv[])
 
     printf("Done\n");
     while (true) {
-        rtos::ThisThread::sleep_for(1000);
+        sleep();
     }
     return 0;
 }

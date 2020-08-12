@@ -24,11 +24,8 @@
     },
     "target_overrides": {
         "*": {
-	    "google-client.iotc-debug-printf": "printf",
             "platform.stdio-convert-newlines": true,
-            "platform.stdio-baud-rate": 115200,
-            "target.components_remove": ["BlueNRG_MS"],
-            "target.features_remove": ["BLE"]
+            "platform.stdio-baud-rate": 115200
         },
         "DISCO_L475VG_IOT01A": {
             "target.components_add": ["wifi_ism43362"],
@@ -38,13 +35,11 @@
             "nsapi.default-wifi-password": "\"pwd\""
         }
     },
-    "macros": [        
+    "macros": [
         "IOTC_FS_MEMORY=1",
 	"IOTC_TLS_LIB_MBEDTLS=1",
         "MBEDTLS_SHA1_C=1",
         "MBEDTLS_SSL_MAX_CONTENT_LEN=4096"
     ]
 }
-
-    
 
