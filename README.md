@@ -52,24 +52,22 @@ It has been tested on K64F with Ethernet and DISCO_L475VG_IOT01A with WiFi, but 
     * create a pub/sub topic
     * create a subscription for the created topic
 
-
-
 1. Update all the cloud credentials in [`mbed_app.json`](./mbed_app.json) file,
     * set project id `"google-cloud-project-id".value`
     * set cloud region `"google-cloud-region".value`
     * set device registry `"google-cloud-registry".value`
     * set device id `"google-cloud-device-id".value`
-    * set a topic `"google-cloud-mqtt-topic".value` that both your device and the cloud can publish messages
+    * set a topic `"google-cloud-mqtt-topic".value` that both your device and the cloud can publish messages to
 
 ## Building and running
 
-1. (If you want to use *WiFi*) set `nsapi.default-wifi-ssid` to your WiFi name and `nsapi.default-wifi-password` to your WiFi password, keeping any escaped quotes (`\"`). If you use a different target, replace `"DISCO_L475VG_IOT01A"` with your target and remove `"target.components_add": ["wifi_ism43362"]` (unless it use the same ISM43362 WiFi module).For example, to use NUCLEO-F429ZI:
+1. (If you want to use *WiFi*) set `nsapi.default-wifi-ssid` to your WiFi name and `nsapi.default-wifi-password` to your WiFi password, keeping any escaped quotes (`\"`). If you use a different target, replace `"DISCO_L475VG_IOT01A"` with your target and remove `"target.components_add": ["wifi_ism43362"]` (unless it uses the same ISM43362 WiFi module). For example, to use NUCLEO-F429ZI:
     ```json
     "NUCLEO-F429ZI": {
-    "target.network-default-interface-type": "WIFI",
-    "nsapi.default-wifi-security": "WPA_WPA2",
-    "nsapi.default-wifi-ssid": "\"SSID\"",
-    "nsapi.default-wifi-password": "\"PASSWORD\""
+        "target.network-default-interface-type": "WIFI",
+        "nsapi.default-wifi-security": "WPA_WPA2",
+        "nsapi.default-wifi-ssid": "\"SSID\"",
+        "nsapi.default-wifi-password": "\"PASSWORD\""
     }
     ```
 
