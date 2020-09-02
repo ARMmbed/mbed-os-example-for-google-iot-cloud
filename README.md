@@ -15,7 +15,7 @@ It has been tested on K64F with Ethernet and DISCO_L475VG_IOT01A with WiFi, but 
 1. Clone this repository on your system, and change the current directory to where the project was cloned:
 
     ```
-    $ git clone git@github.com:armmbed/mbed-os-example-for-google-iot-cloud && cd mbed-os-example-for-google-iot-cloud
+    $ git clone https://github.com/ARMmbed/mbed-os-example-for-google-iot-cloud.git && cd mbed-os-example-for-google-iot-cloud
     $ mbed deploy
     ```
 
