@@ -1,6 +1,6 @@
 ﻿![](./resources/official_armmbed_example_badge.png)
 
-# Google Cloud Mbed OS example
+# Mbed OS example for Google cloud
 
 The example project is part of the [Arm Mbed OS Official Examples](https://os.mbed.com/code/). It contains an application that uses the [Google Cloud IoT device SDK](https://github.com/GoogleCloudPlatform/iot-device-sdk-embedded-c/) to connect to an IoT core instance using the MQTT protocol and publishes a message every 3 seconds for 30 seconds or until a message is received.
 
