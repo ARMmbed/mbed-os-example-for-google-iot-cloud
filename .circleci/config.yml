@@ -10,9 +10,9 @@ jobs:
     working_directory: ~
     steps:
       - checkout:
-          path: mbed-os-example-google-cloud
+          path: mbed-os-example-for-google-iot-cloud
       - run: |
-          cd mbed-os-example-google-cloud
+          cd mbed-os-example-for-google-iot-cloud
           mbed deploy
           mbed compile -t GCC_ARM -m K64F
 
