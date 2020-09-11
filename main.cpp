@@ -1,4 +1,5 @@
-/* Mbed OS Google Cloud example
+/*
+ * Mbed OS Google Cloud example
  * Copyright (c) 2018-2020, Google LLC.
  * Copyright (c) 2019-2020, Arm Limited and affiliates.
  * SPDX-License-Identifier: Apache-2.0
