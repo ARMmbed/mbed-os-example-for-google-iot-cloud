@@ -1,5 +1,8 @@
-// GOOGLE CLOUD Certificates
-
+/*
+ * Google Cloud Certificates
+ * Copyright (c) 2019-2020, Arm Limited and affiliates.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #ifndef GOOGLE_CLOUD_CREDENTIALS_H
 #define GOOGLE_CLOUD_CREDENTIALS_H
 
