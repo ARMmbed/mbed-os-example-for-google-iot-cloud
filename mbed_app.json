@@ -24,8 +24,7 @@
     },
     "target_overrides": {
         "*": {
-            "platform.stdio-convert-newlines": true,
-            "platform.stdio-baud-rate": 115200
+            "platform.stdio-convert-newlines": true
         },
         "DISCO_L475VG_IOT01A": {
             "target.components_add": ["wifi_ism43362"],
