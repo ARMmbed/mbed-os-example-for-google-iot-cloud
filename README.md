@@ -29,17 +29,12 @@ It has been tested on K64F with Ethernet and DISCO_L475VG_IOT01A with WiFi, but 
 
 1. Follow the below steps to generate the key pair and certificate using OpenSSL
 
-    1. create a self-signed CA with 365 days validity
+    1. create a P-256 Elliptic Curve key pair
         ```
-        $ openssl req -new -x509 -days 365 -extensions v3_ca -keyout ca.key -out ca.crt -subj "/CN=unused"
+        $ openssl ecparam -genkey -name prime256v1 -noout -out ec_private.pem
+        $ openssl ec -in ec_private.pem -pubout -out ec_public.pem        
         ```
-    1. create a client key pair and certification
-        ```
-        $ openssl ecparam -genkey -name prime256v1 -noout -out client.key
-        $ openssl req -out client.csr -key client.key -new -subj "/CN=unused"
-        $ openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365
-        ```
-        Once you have generated the certificates, you will need to place client.key in the [`google_cloud_credentials.h`](./google_cloud_credentials.h) file of this example and `ca.crt` and `client.crt` to be uploaded in Google Cloud portal while creating the device registry and add a device.
+        Once you have generated the certificates, you will need to place `ec_private.pem` in `clientKey` array in the [`google_cloud_credentials.h`](./google_cloud_credentials.h) file of this example and `ec_public.pem` to be uploaded in Google Cloud portal while creating the device.
 
 1. Create a Google Cloud account if you don't have one, and log in to it.
 
