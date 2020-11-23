@@ -286,8 +286,6 @@ int main(int argc, char *argv[])
     iotc_shutdown();
 
     printf("Done\n");
-    while (true) {
-        sleep();
-    }
+
     return 0;
 }

@@ -1,0 +1,23 @@
+connected to mqtt.2030.ltsapis.goog\:8883
+publishing msg "10 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "9 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "8 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "7 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "6 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "5 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "4 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "3 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "2 messages left to send, or until we receive a reply"
+Message sent successfully
+publishing msg "1 messages left to send, or until we receive a reply"
+Message sent successfully
+Message body: Hello from Google cloud IOT Core
+Done
