@@ -9,21 +9,18 @@ You can build the project with all supported [Mbed OS build tools](https://os.mb
 
 It has been tested on K64F with Ethernet and DISCO_L475VG_IOT01A with WiFi, but any Mbed OS 6 targets with Internet access should work.
 
-## Downloading this project
-1. [Install Mbed CLI](https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html).
+## Mbed OS build tools
 
-1. Clone this repository on your system, and change the current directory to where the project was cloned:
+### Mbed CLI 2
+Starting with version 6.5, Mbed OS uses Mbed CLI 2. It uses Ninja as a build system, and CMake to generate the build environment and manage the build process in a compiler-independent manner. If you are working with Mbed OS version prior to 6.5 then check the section [Mbed CLI 1](#mbed-cli-1).
+1. [Install Mbed CLI 2](https://os.mbed.com/docs/mbed-os/latest/build-tools/install-or-upgrade.html).
+1. From the command-line, import the example: `mbed-tools import mbed-os-example-for-google-iot-cloud`
+1. Change the current directory to where the project was imported.
 
-    ```
-    $ git clone https://github.com/ARMmbed/mbed-os-example-for-google-iot-cloud.git && cd mbed-os-example-for-google-iot-cloud
-    $ mbed deploy
-    ```
-
-    Alternatively, you can download the example project with Arm Mbed CLI using the `import` subcommand:
-
-    ```
-    $ mbed import mbed-os-example-for-google-iot-cloud && cd mbed-os-example-for-google-iot-cloud
-    ```
+### Mbed CLI 1
+1. [Install Mbed CLI 1](https://os.mbed.com/docs/mbed-os/latest/quick-start/offline-with-mbed-cli.html).
+1. From the command-line, import the example: `mbed import mbed-os-example-for-google-iot-cloud`
+1. Change the current directory to where the project was imported.
 
 ## Configuring the Google Cloud IoT Core
 
@@ -69,9 +66,19 @@ It has been tested on K64F with Ethernet and DISCO_L475VG_IOT01A with WiFi, but 
 1. For Ethernet (e.g on K64F), connect a cable to the port.
 1. Connect your development board to your PC with a USB cable.
 1. Compile, flash and run the example
+
+    * Mbed CLI 2
+
+    ```bash
+    $ mbed-tools compile -m <TARGET> -t <TOOLCHAIN> --flash  --sterm
     ```
-    mbed compile -m <TARGET> -t <TOOLCHAIN> -f --sterm --baud 115200
+
+    * Mbed CLI 1
+
+    ```bash
+    $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash  --sterm
     ```
+
 For example, `<TARGET>` can be `DISCO_L475VG_IOT01A` and `<TOOLCHAIN>` can be `GCC_ARM` if you want to use this combination.
 
 ## Expected output
